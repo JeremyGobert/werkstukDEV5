@@ -1,0 +1,25 @@
+{
+  "name": "werkstukdev5",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JeremyGobert/werkstukDEV5.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JeremyGobert/werkstukDEV5/issues"
+  },
+  "homepage": "https://github.com/JeremyGobert/werkstukDEV5#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "knex": "^0.95.14",
+    "postgres": "^1.0.2"
+  }
+}
