@@ -44,6 +44,11 @@ app.get('/gatAll', (req, res) => {
     });
 });
 
+app.get('/deleteID/:gameId', (req, res) => {
+    const searchID = Object.values(req.params).toString();
+    pg('games').where({ id: searchID }).del();
+});
+
 
 
 app.listen(port, () => {
