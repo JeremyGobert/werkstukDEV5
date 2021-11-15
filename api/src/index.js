@@ -6,13 +6,13 @@ const port = 3000;
 /* const { faggot } = require("./helpers/dbHelpers"); */
 
 async function createTables(pg) {
-    pg.schema.hasTable('users').then(function (exists) {
+    pg.schema.hasTable('games').then(function (exists) {
         if (!exists) {
             return pg.schema.createTable('games', function (t) {
                 t.increments('id').primary();
                 t.string('game_name', 100);
                 t.string('img_link', 100);
-                t.text('desription');
+                t.text('desk');
             });
         } else {
             console.log("table fucking exists");
@@ -32,13 +32,22 @@ const pg = require('knex')({
     }
 });
 
-
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+        res.send("hellooooooo");
 });
 
+
+app.get('/gatAll', (req, res) => {
+    pg('games').insert({game_name: 'Slaughterhouse Five', img_link: 'no shit', desk: 'iets fucking klote'});
+    pg.select("*").table("games").then((data) => {
+        res.send(data);
+    });
+});
+
+
+
 app.listen(port, () => {
-    console.log(process.env);
+
 
     console.log(`Example app listening at http://localhost:${port}`);
 
