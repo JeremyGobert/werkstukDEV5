@@ -1,11 +1,11 @@
 {
   "name": "werkstukdev5",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prod": "start index.js",
+    "start": "nodemon src/index.js",
+    "test": "fuckinghell"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,11 @@
   "dependencies": {
     "express": "^4.17.1",
     "knex": "^0.95.14",
+    "nodemon": "^2.0.15",
+    "pg": "^8.7.1",
     "postgres": "^1.0.2"
-  }
+  },
+  "devDependencies": {},
+  "keywords": [],
+  "description": ""
 }
