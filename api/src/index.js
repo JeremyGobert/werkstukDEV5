@@ -49,6 +49,19 @@ app.get('/deleteID/:gameId', (req, res) => {
     pg('games').where({ id: searchID }).del();
 });
 
+app.get('/deleteID/:gameId', (req, res) => {
+    const deleteID = Object.values(req.params).toString();
+    pg('games').where({ id: deleteID }).del();
+});
+
+app.get('/updateID/:gameId', (req, res) => {
+    let updateID = req.query.id;
+    let name = req.query.newName;
+    pg('games').where({ id: updateID }).update({ game_name: name });
+});
+
+
+
 
 
 app.listen(port, () => {
