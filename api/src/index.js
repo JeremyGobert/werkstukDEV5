@@ -2,9 +2,8 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
-/* const  { createTables } = require("./helpers/dbHelpers"); */
-/* const { faggot } = require("./helpers/dbHelpers"); */
-
+/* const  { createTables } = require("./helpers/dbHelpers.js");
+ */
 async function createTables(pg) {
     pg.schema.hasTable('games').then(function (exists) {
         if (!exists) {
@@ -15,11 +14,25 @@ async function createTables(pg) {
                 t.text('desk');
             });
         } else {
-            console.log("table fucking exists");
+            console.log("table games exists!");
+        }
+    });
+    pg.schema.hasTable('categories').then(function (exists) {
+        if (!exists) {
+            return pg.schema.createTable('categories', function (t) {
+                t.increments('id').primary();
+                t.string('categorie', 100);
+            }).then(function (result) {
+                pg('games').join('contacts', 'users.id', '=', 'contacts.id').join('contacts', {'users.id': 'contacts.id'})
+                
+            });
+        } else {
+            console.log("table categories exists!");
         }
     });
 }
 
+/* https://api.boardgameatlas.com/api/game/categories?pretty=true&client_id=SlpYx6GX5u */
 
 const pg = require('knex')({
     client: 'pg',
@@ -33,42 +46,71 @@ const pg = require('knex')({
 });
 
 app.get('/', (req, res) => {
-        res.send("hellooooooo");
+    let routes = [];
+    app._router.stack.forEach(element => {
+        if (element.name === "bound dispatch") {
+            routes.push(element.route.path);
+        }
+    });
+    res.send(routes);
 });
 
 
-app.get('/gatAll', (req, res) => {
-    pg('games').insert({game_name: 'Slaughterhouse Five', img_link: 'no shit', desk: 'iets fucking klote'});
+app.get('/getAll', (req, res) => {
     pg.select("*").table("games").then((data) => {
         res.send(data);
     });
 });
 
+
+app.get('/insert/:name-:img-:desc', (req, res) => {
+    let name = req.params.name;
+    let link = req.params.img;
+    let desc = req.params.desc;
+    pg('games').insert({
+            game_name: name,
+            img_link: link,
+            desription: desc
+        })
+        .then(function (result) {
+            res.json({
+                success: true,
+                message: 'ok'
+            });
+        });
+});
+
+
 app.get('/deleteID/:gameId', (req, res) => {
-    const searchID = Object.values(req.params).toString();
-    pg('games').where({ id: searchID }).del();
-});
-
-app.get('/deleteID/:gameId', (req, res) => {
-    const deleteID = Object.values(req.params).toString();
-    pg('games').where({ id: deleteID }).del();
-});
-
-app.get('/updateID/:gameId', (req, res) => {
-    let updateID = req.query.id;
-    let name = req.query.newName;
-    pg('games').where({ id: updateID }).update({ game_name: name });
+    let Id = req.params.gameId;
+    pg('games').where('id', Id).del().then(function (result) {
+        res.json({
+            success: true,
+            message: 'ok'
+        });
+    });
 });
 
 
+app.get('/updateName/:gameId-:newName', (req, res) => {
+    let updateID = req.params.gameId;
+    let name = req.params.newName;
+    pg('games').where({
+        id: updateID
+    }).update({
+        game_name: name
+    }).then(function (result) {
+        res.json({
+            success: true,
+            message: 'ok'
+        });
+    });
+});
 
 
 
 app.listen(port, () => {
-
-
     console.log(`Example app listening at http://localhost:${port}`);
-
 });
 
 createTables(pg);
