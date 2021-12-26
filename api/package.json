@@ -5,8 +5,8 @@
   "scripts": {
     "prod": "start index.js",
     "start": "nodemon --legacy-watch src/index.js",
-    "test": "jest --watchAll --detect-open-handels",
-    "test-ci": "jest --detect-open-handels --forceExit"
+    "test": "jest --watchAll --detect-open-handles",
+    "test-ci": "jest --detect-open-handles --forceExit"
   },
   "repository": {
     "type": "git",

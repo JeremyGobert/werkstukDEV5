@@ -1,2 +1,4 @@
 api/node_modules
 _volumes
+.env
+api/.env

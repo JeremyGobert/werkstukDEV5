@@ -1,39 +1,9 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+const  helper = require("./helpers/dbHelpers.js");
 
-/* const  { createTables } = require("./helpers/dbHelpers.js");
- */
-async function createTables(pg) {
-    pg.schema.hasTable('games').then(function (exists) {
-        if (!exists) {
-            return pg.schema.createTable('games', function (t) {
-                t.increments('id').primary();
-                t.string('game_name', 100);
-                t.string('img_link', 100);
-                t.text('desk');
-            });
-        } else {
-            console.log("table games exists!");
-        }
-    });
-    pg.schema.hasTable('categories').then(function (exists) {
-        if (!exists) {
-            return pg.schema.createTable('categories', function (t) {
-                t.increments('id').primary();
-                t.string('categorie', 100);
-            }).then(function (result) {
-                pg('games').join('contacts', 'users.id', '=', 'contacts.id').join('contacts', {'users.id': 'contacts.id'})
-                
-            });
-        } else {
-            console.log("table categories exists!");
-        }
-    });
-}
-
-/* https://api.boardgameatlas.com/api/game/categories?pretty=true&client_id=SlpYx6GX5u */
-
+//connection with database server
 const pg = require('knex')({
     client: 'pg',
     connection: {
@@ -45,6 +15,7 @@ const pg = require('knex')({
     }
 });
 
+//get all usable routs 
 app.get('/', (req, res) => {
     let routes = [];
     app._router.stack.forEach(element => {
@@ -55,22 +26,29 @@ app.get('/', (req, res) => {
     res.send(routes);
 });
 
-
-app.get('/getAll', (req, res) => {
-    pg.select("*").table("games").then((data) => {
+//get all games 
+app.get('/getAllGames', (req, res) => {
+    pg('games').table("games").join("categories","games.categories_id","=","categories.id").then((data) => {
         res.send(data);
     });
 });
 
+//get all categories
+app.get('/getAllCategories', (req, res) => {
+    pg.select('*').from('categories').then((data) => {
+        res.send(data);
+    });
+});
 
-app.get('/insert/:name-:img-:desc', (req, res) => {
+//instert a new game 
+app.get('/insertGame/:name-:img-:catid', (req, res) => {
     let name = req.params.name;
     let link = req.params.img;
-    let desc = req.params.desc;
+    let catid = req.params.catid;
     pg('games').insert({
             game_name: name,
             img_link: link,
-            desription: desc
+            categories_id: catid
         })
         .then(function (result) {
             res.json({
@@ -80,8 +58,32 @@ app.get('/insert/:name-:img-:desc', (req, res) => {
         });
 });
 
+//insert a new categorie
+app.get('/insertCategorie/:cat', (req, res) => {
+    let cat = req.params.cat;
+    let catCheck = parseInt(req.params.cat);
+    if(!Number.isInteger(catCheck)){
+        pg('categories').insert({
+            categorie: cat
+        })
+        .then(function (result) {
+            res.json({
+                success: true,
+                message: 'ok',
+                input: cat
+            });
+        });
+    }else{
+        res.json({
+            success: false,
+            message: 'no numbers',
+            wrongInput: cat
+        });
+    }
+});
 
-app.get('/deleteID/:gameId', (req, res) => {
+//delete on game ID
+app.get('/deleteOnID/:gameId', (req, res) => {
     let Id = req.params.gameId;
     pg('games').where('id', Id).del().then(function (result) {
         res.json({
@@ -91,26 +93,36 @@ app.get('/deleteID/:gameId', (req, res) => {
     });
 });
 
-
-app.get('/updateName/:gameId-:newName', (req, res) => {
-    let updateID = req.params.gameId;
+//update on game ID
+app.get('/updateNameOnID/:gameId-:newName', (req, res) => {
+    let updateID = parseInt(req.params.gameId);
     let name = req.params.newName;
-    pg('games').where({
-        id: updateID
-    }).update({
-        game_name: name
-    }).then(function (result) {
-        res.json({
-            success: true,
-            message: 'ok'
+    if(Number.isInteger(updateID)){
+        pg('games').where({
+            id: updateID
+        }).update({
+            game_name: name
+        }).then(function (result) {
+            res.json({
+                success: true,
+                message: 'ok',
+                inputID: updateID,
+                inputName: name
+            });
         });
-    });
+    } else{
+        res.json({
+            success: false,
+            message: 'no id given',
+            input: req.params.gameId
+        });
+    }
+    
 });
-
-
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
 
-createTables(pg);
+//creating the tables 
+helper.createTables(pg);
